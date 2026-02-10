@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多维政治倾向测算器 - 2026 深度典藏版</title>
+    <style>
+        :root {
+            --primary: #2E7D32;      /* 更深沉的绿 */
+            --primary-light: #E8F5E9;
+            --accent: #66BB6A;       /* 鲜亮的绿用于按钮 */
+            --bg: #FAFAFA;
+            --white: #ffffff;
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
+            --danger: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            background: var(--white);
+            margin: 20px;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.2em;
+            margin: 0 0 10px 0;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--text-sub);
+            font-size: 0.95em;
+            background: var(--primary-light);
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        /* Progress */
+        .progress-wrapper {
+            width: 100%;
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            border-radius: 3px;
+        }
+
+        /* Question Card */
+        .question-card {
+            width: 100%;
+            min-height: 150px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .tag {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #999;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .q-text {
+            font-size: 1.5em;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-main);
+        }
+
+        /* Options */
+        .options-grid {
+            display: grid;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .opt-btn {
+            padding: 16px;
+            border: 2px solid #f0f0f0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            color: var(--text-main);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .opt-btn:hover {
+            border-color: var(--accent);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .opt-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Result Section */
+        #result-section {
+            display: none;
+            width: 100%;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .archetype-title {
+            font-size: 2.5em;
+            color: var(--primary);
+            margin: 10px 0;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), #81C784);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Analysis Box */
+        .analysis-box {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 6px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+
+        .analysis-text {
+            font-size: 1.05em;
+            line-height: 1.8;
+            color: #444;
+            text-align: justify;
+        }
+
+        .rep-person {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed #e0e0e0;
+            font-size: 0.9em;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rep-name {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.1em;
+        }
+
+        /* Bars */
+        .bar-container {
+            margin: 25px 0;
+        }
+        
+        .bar-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.85em;
+        }
+        
+        .bar-label { width: 15%; font-weight: bold; color: #555; }
+        .bar-label.left { text-align: right; padding-right: 10px; }
+        .bar-label.right { text-align: left; padding-left: 10px; }
+        
+        .track {
+            flex: 1;
+            height: 18px;
+            background: #eee;
+            border-radius: 9px;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .fill-l { background: #ff7043; height: 100%; display: flex; align-items: center; justify-content: flex-start; padding-left: 6px; color: white; font-size: 0.7em; }
+        .fill-r { background: #66bb6a; height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; color: white; font-size: 0.7em; }
+
+        .restart-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+        }
+        
+        .restart-btn:hover {
+            background: #1b5e20;
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
+        }
+
+        /* Effects */
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 25px 20px; margin: 0; min-height: 100vh; border-radius: 0; }
+            .q-text { font-size: 1.2em; }
+            .bar-label { font-size: 0.7em; width: 18%; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div class="container">
+    <header onclick="triggerEasterEgg()">
+        <h1>🔮 政治光谱测算仪</h1>
+        <div class="subtitle">2026 中国语境适配版</div>
+    </header>
+
+    <div id="intro-view">
+        <div style="text-align: center; padding: 20px 0;">
+            <p style="font-size: 1.1em; line-height: 1.8; color: #555;">
+                这里没有枯燥的学术名词。<br>
+                我们将通过 30 道“直击灵魂”的问题，<br>
+                拆解你潜意识里的意识形态代码。<br><br>
+                <strong>警告：最终结果可能含有微量冒犯成分。</strong>
+            </p>
+            <button class="restart-btn" onclick="startQuiz()">开始审判</button>
+        </div>
+    </div>
+
+    <div id="quiz-view" style="display: none; width: 100%;">
+        <div class="progress-wrapper">
+            <div class="progress-fill" id="progress-bar"></div>
+        </div>
+
+        <div class="question-card" id="q-card">
+            <span class="tag" id="q-tag">Category</span>
+            <div class="q-text" id="q-text">Loading...</div>
+        </div>
+
+        <div class="options-grid">
+            <button class="opt-btn" onclick="answer(2)" style="border-color: #2e7d32; color: #2e7d32;">强烈同意 😍</button>
+            <button class="opt-btn" onclick="answer(1)" style="border-color: #66bb6a; color: #66bb6a;">同意 🙂</button>
+            <button class="opt-btn" onclick="answer(0)" style="border-color: #9e9e9e; color: #7f8c8d;">中立/不知道 😐</button>
+            <button class="opt-btn" onclick="answer(-1)" style="border-color: #ef5350; color: #ef5350;">反对 😕</button>
+            <button class="opt-btn" onclick="answer(-2)" style="border-color: #c62828; color: #c62828;">强烈反对 😠</button>
+        </div>
+    </div>
+
+    <div id="result-section">
+        <div class="result-header">
+            <div style="font-size: 0.9em; color: #888; text-transform: uppercase; letter-spacing: 2px;">你的成分判定为</div>
+            <div class="archetype-title" id="result-title">计算中...</div>
+        </div>
+
+        <div class="bar-container" id="chart-area"></div>
+
+        <div class="analysis-box">
+            <div class="analysis-text" id="result-desc">
+                分析文本生成中...
+            </div>
+            <div class="rep-person">
+                <span>👻 精神图腾：</span>
+                <span class="rep-name" id="result-person">...</span>
+            </div>
+        </div>
+
+        <button class="restart-btn" onclick="location.reload()">不服？重测（换个马甲）</button>
+    </div>
+</div>
+
+<script>
+    // === 数据配置 ===
+    // 维度：Econ(经), Dipl(外), Govt(政), Scty(社), Envr(态)
+    // 权重定义：1 = 正向(Right/Auth/Trad), -1 = 反向(Left/Lib/Prog)
+    // 为了方便计算，内部逻辑：
+    // Econ: 负=计划, 正=市场
+    // Dipl: 负=全球, 正=国家
+    // Govt: 负=自由, 正=权威
+    // Scty: 负=进步, 正=守成
+    // Envr: 负=环保, 正=发展
+
+    const questions = [
+        // 经济轴
+        { t: "只有国家掌控核心命脉，才能避免资本家把路灯挂满。", cat: "经济", d: "econ", w: -1 },
+        { t: "富人税收太低了，他们呼吸的空气都应该按立方米收费来补贴穷人。", cat: "经济", d: "econ", w: -1 },
+        { t: "只要不违法，企业裁员、倒闭都是市场优胜劣汰的自然美。", cat: "经济", d: "econ", w: 1 },
+        { t: "最低工资限制了老板雇佣更多人的意愿，应该废除。", cat: "经济", d: "econ", w: 1 },
+        { t: "医疗和教育如果完全私有化，服务质量绝对比现在好。", cat: "经济", d: "econ", w: 1 },
+        { t: "土地私有化是神圣不可侵犯的，即便那是祖传的荒地。", cat: "经济", d: "econ", w: 1 },
+
+        // 外交轴 (正=国家, 负=全球)
+        { t: "为了国家利益，撕毁几张国际条约就像撕毁废纸一样合理。", cat: "外交", d: "dipl", w: 1 },
+        { t: "真理只在大炮的射程之内，口径即正义。", cat: "外交", d: "dipl", w: 1 },
+        { t: "比起所谓的国际形象，我更在乎本国工人的饭碗是否被外国人抢走。", cat: "外交", d: "dipl", w: 1 },
+        { t: "气候变暖是全人类的问题，我们应该主动牺牲一部分经济利益来配合国际标准。", cat: "外交", d: "dipl", w: -1 },
+        { t: "外来移民能带来丰富的美食和文化，我们应该敞开大门。", cat: "外交", d: "dipl", w: -1 },
+        { t: "爱国主义有时是流氓最后的庇护所。", cat: "外交", d: "dipl", w: -1 },
+
+        // 政治轴 (正=权威, 负=自由)
+        { t: "为了抓捕罪犯，政府在每个路口装满摄像头是完全可以接受的。", cat: "政治", d: "govt", w: 1 },
+        { t: "一个强有力的领袖比几百个吵吵嚷嚷的议员更能干实事。", cat: "政治", d: "govt", w: 1 },
+        { t: "乱世用重典，对于扰乱社会秩序的人绝不能手软。", cat: "政治", d: "govt", w: 1 },
+        { t: "我誓死捍卫你说话的权利，哪怕你说的全是废话。", cat: "政治", d: "govt", w: -1 },
+        { t: "政府不应该知道我今天晚上吃了什么，或者我在网上浏览了什么。", cat: "政治", d: "govt", w: -1 },
+        { t: "为了所谓的'大局'牺牲个人利益，通常都是忽悠。", cat: "政治", d: "govt", w: -1 },
+
+        // 社会轴 (正=守成, 负=进步)
+        { t: "传统的家庭观念正在崩溃，这绝对是社会道德沦丧的开始。", cat: "社会", d: "scty", w: 1 },
+        { t: "学校应该多教点尊师重道，少搞点那些花里胡哨的权利教育。", cat: "社会", d: "scty", w: 1 },
+        { t: "老祖宗留下的规矩，大部分都是有道理的。", cat: "社会", d: "scty", w: 1 },
+        { t: "同性恋、丁克、不婚族都是个人选择，关别人屁事。", cat: "社会", d: "scty", w: -1 },
+        { t: "为了科学进步，我们可以适当挑战一下传统的伦理底线。", cat: "社会", d: "scty", w: -1 },
+        { t: "性别只是一种社会建构，不应该限制人的发展。", cat: "社会", d: "scty", w: -1 },
+
+        // 生态轴 (正=发展, 负=环保)
+        { t: "为了保护一只珍稀青蛙而叫停百亿的大工程是愚蠢的。", cat: "生态", d: "envr", w: 1 },
+        { t: "技术进步迟早能解决污染问题，现在不用瞎操心。", cat: "生态", d: "envr", w: 1 },
+        { t: "饭都吃不饱的时候谈环保，就是何不食肉糜。", cat: "生态", d: "envr", w: 1 },
+        { t: "绿水青山就是金山银山，哪怕GDP倒退也要保住环境。", cat: "生态", d: "envr", w: -1 },
+        { t: "人类是地球的癌细胞，应该大幅减少工业活动。", cat: "生态", d: "envr", w: -1 },
+        { t: "我愿意为了减少碳排放而放弃开燃油车和吃牛肉。", cat: "生态", d: "envr", w: -1 }
+    ];
+
+    let currentIdx = 0;
+    let scores = { econ: 0, dipl: 0, govt: 0, scty: 0, envr: 0 };
+    const maxPerDim = 12; // 6题 * 2分
+
+    // === 核心逻辑 ===
+
+    function startQuiz() {
+        document.getElementById('intro-view').style.display = 'none';
+        document.getElementById('quiz-view').style.display = 'block';
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        const card = document.getElementById('q-card');
+        
+        // 动画切换
+        card.style.opacity = 0;
+        card.style.transform = "translateY(10px)";
+        
+        setTimeout(() => {
+            document.getElementById('q-tag').innerText = `NO.${currentIdx + 1} / 30 · ${q.cat}`;
+            document.getElementById('q-text').innerText = q.t;
+            
+            // 进度条
+            const pct = (currentIdx / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+
+            card.style.opacity = 1;
+            card.style.transform = "translateY(0)";
+        }, 200);
+    }
+
+    function answer(val) {
+        const q = questions[currentIdx];
+        scores[q.d] += val * q.w;
+
+        if (Math.abs(val) === 2) fireConfetti(0.3); // 小礼花
+
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            finishQuiz();
+        }
+    }
+
+    function finishQuiz() {
+        document.getElementById('quiz-view').style.display = 'none';
+        document.getElementById('result-section').style.display = 'block';
+        
+        // 渲染图表
+        renderCharts();
+        // 生成深度分析
+        analyzeResult();
+        // 大礼花
+        fireConfetti(1.5);
+    }
+
+    // === 结果渲染与毒舌分析 ===
+
+    function renderCharts() {
+        const container = document.getElementById('chart-area');
+        const dims = [
+            { k:'econ', l:'计划经济', r:'市场经济' },
+            { k:'dipl', l:'全球主义', r:'国家主义' },
+            { k:'govt', l:'自由意志', r:'权威政府' },
+            { k:'scty', l:'社会进步', r:'传统守成' },
+            { k:'envr', l:'生态优先', r:'发展优先' }
+        ];
+
+        let html = '';
+        dims.forEach(d => {
+            // 映射 -12~12 到 0~100
+            let val = scores[d.k];
+            let pctR = ((val + maxPerDim) / (maxPerDim * 2)) * 100;
+            // 视觉修正，避免0%
+            pctR = Math.max(5, Math.min(95, pctR));
+            let pctL = 100 - pctR;
+
+            html += `
+            <div class="bar-row">
+                <div class="bar-label left">${d.l}</div>
+                <div class="track">
+                    <div class="fill-l" style="width:${pctL}%">${Math.round(pctL)}%</div>
+                    <div class="fill-r" style="width:${pctR}%">${Math.round(pctR)}%</div>
+                </div>
+                <div class="bar-label right">${d.r}</div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function analyzeResult() {
+        // 标准化得分 (-1 到 1) 用于逻辑判断
+        const s = {
+            eco: scores.econ / maxPerDim, // 负=计划, 正=市场
+            dip: scores.dipl / maxPerDim, // 负=全球, 正=国家
+            gov: scores.govt / maxPerDim, // 负=自由, 正=权威
+            soc: scores.scty / maxPerDim, // 负=进步, 正=守成
+            env: scores.envr / maxPerDim  // 负=环保, 正=发展
+        };
+
+        let title = "";
+        let desc = "";
+        let person = "";
+
+        // === 复杂判定逻辑 ===
+
+        // 1. 工业党/国家主义 (权威+国家+发展+计划/混合)
+        if (s.gov > 0.3 && s.dip > 0.3 && s.env > 0.1) {
+            title = "入关学资深讲师";
+            desc = "你笃信真理只在大炮的射程之内。在你眼中，自由是小布尔乔亚的无病呻吟，只有钢铁洪流和GDP增长才是硬道理。你对西方的那套“普世价值”嗤之以鼻，认为那不过是衰落帝国的遮羞布。你可能经常在深夜思考大国博弈的棋局，并认为为了星辰大海，个人的那点小确幸完全可以忽略不计。你的口头禅大概是：“放弃幻想，准备斗争。”";
+            person = "俾斯麦、工业党大V、刘慈欣笔下的章北海";
+        }
+        // 2. 自由意志主义/市场原教旨 (市场+自由+全球/国家均可)
+        else if (s.eco > 0.4 && s.gov < -0.3) {
+            title = "赛博无政府资本家";
+            desc = "你认为税收就是合法的抢劫，政府存在的唯一意义就是维持治安（甚至连治安都可以外包给保安公司）。你梦想着一个建立在区块链上的世界，那里没有监管，只有智能合约。你对任何形式的集体主义都过敏，认为“社会”这个词只是为了掩盖无能者的借口。如果可以，你会毫不犹豫地宣布你的卧室为独立主权国家，并发行自己的货币。";
+            person = "哈耶克、早期的马斯克、囤积比特币的极客";
+        }
+        // 3. 白左/社会民主 (计划+自由+进步+环保)
+        else if (s.eco < -0.3 && s.gov < -0.2 && s.soc < -0.3) {
+            title = "北欧梦游者";
+            desc = "你的灵魂深处住着一个瑞典人。你痛恨资本的贪婪，同情所有被边缘化的群体，并坚定地认为富人呼吸的每一口空气都带有原罪。你支持高税收、高福利、以及无限的文化多元。在现实中，你可能一边喝着星巴克（尽管你批判跨国企业），一边在手机上为远方的雨林和难民流泪。你是一个善良的人，就是有时候善良得让旁边的人想报警。";
+            person = "桑德斯、齐泽克、大学社会学系教授";
+        }
+        // 4. 传统保守派 (权威+守成+市场/混合)
+        else if (s.gov > 0.2 && s.soc > 0.4) {
+            title = "旧秩序的守夜人";
+            desc = "你看着窗外的世界，觉得它疯了。你怀念那个车马很慢、书信很远、性别只有两个的年代。你认为现代社会的混乱源于对传统权威的解构和对欲望的放纵。你强调家庭责任、社区秩序和爱国情怀。对于那些染着绿头发、在街上大喊大叫的年轻人，你只想送他们去军训三个月。你是社会稳定的压舱石，也是那个在饭桌上让晚辈不敢说话的长辈。";
+            person = "撒切尔夫人、儒家严父、保守派法官";
+        }
+        // 5. 激进环保/反工业 (环保极高)
+        else if (s.env < -0.6) {
+            title = "德鲁伊教派大长老";
+            desc = "在你看来，工业革命是人类历史上最大的灾难。如果给你一个按钮，可以让人类文明倒退回农耕时代但能拯救地球，你会毫不犹豫地按下去。你对GDP数字毫无感觉，但看到一棵树被砍会心如刀绞。你认为人类是地球的病毒，而新冠可能只是地球的免疫反应。你的理想生活是像阿凡达里的纳威人那样，骑着鸟在森林里乱飞。";
+            person = "格蕾塔·通贝里、宫崎骏电影主角、极端动保人士";
+        }
+        // 6. 左翼民粹/老左派 (计划+权威+国家)
+        else if (s.eco < -0.4 && s.gov > 0.2 && s.dip > 0.2) {
+            title = "红色怀旧布尔什维克";
+            desc = "你非常怀念那个大院时代，认为虽然那时物质匮乏，但精神是纯粹的，人与人是平等的。你痛恨现在的资本家和买办，认为他们窃取了工人的劳动果实。你支持铁腕手段来重新分配财富，把那些吞进去的利益吐出来。你是一个朴素的爱国者，但你的爱国方式是想把现在的既得利益者挂在路灯上。";
+            person = "切·格瓦拉、激进工会领袖";
+        }
+        // 7. 进步的全球化精英 (市场+全球+进步)
+        else if (s.eco > 0.1 && s.dip < -0.3 && s.soc < -0.3) {
+            title = "达沃斯论坛永久会员";
+            desc = "你是全球化的最大受益者和拥护者。你相信科技、开放市场和多元文化能解决一切问题。你是一个世界公民，护照对你来说只是旅行证件，而不是身份认同。你看不上民粹主义的土味，也受不了极左的幼稚。你理智、冷感，认为只要算法足够先进，世界就能自动运行良好。你可能住在上海或纽约，喝着依云水，俯视着众生。";
+            person = "比尔·盖茨、典型的中产精英、科技巨头CEO";
+        }
+        // 8. 中庸/混乱 (各项数值极低)
+        else {
+            title = "混沌中立的烧烤师傅";
+            desc = "你的政治光谱是一团浆糊，或者说是一门太极艺术。你觉得左派太激进，右派太冷血，前人太古板，后人太疯狂。你唯一的政治诉求可能就是物价别涨，工资多涨。在互联网的骂战中，你是那个默默吃瓜的路人甲，心想：“这帮人是不是作业太少了？”你完美地融入了人群，是社会稳定的最大公约数，也是变革者最头疼的“沉默大多数”。";
+            person = "小区门口下棋的大爷、只想安稳度日的普通打工人";
+        }
+
+        document.getElementById('result-title').innerText = title;
+        document.getElementById('result-desc').innerText = desc;
+        document.getElementById('result-person').innerText = person;
+    }
+
+    // === 彩蛋 & 礼花 ===
+    
+    let eggCount = 0;
+    function triggerEasterEgg() {
+        eggCount++;
+        if (eggCount === 5) {
+            alert("🐰 恭喜触发隐藏成就：\n【键政局局长】\n\n送你一句话：\n主义都是生意，只有生活才是主义。");
+            document.body.style.background = "linear-gradient(45deg, #f3e5f5, #e1bee7)";
+        }
+    }
+
+    const canvas = document.getElementById("confetti-canvas");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function fireConfetti(intensity) {
+        const colors = ['#2E7D32', '#66BB6A', '#FF7043', '#FFCA28', '#42A5F5'];
+        const count = 40 * intensity;
+        
+        for (let i = 0; i < count; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height * 0.2 - 50,
+                r: Math.random() * 6 + 2,
+                d: Math.random() * count,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                vx: (Math.random() - 0.5) * 4,
+                vy: Math.random() * 4 + 2,
+                tilt: Math.random() * 10
+            });
+        }
+        if (!isAnimating) animate();
+    }
+
+    let isAnimating = false;
+    function animate() {
+        isAnimating = true;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        let alive = false;
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            
+            p.y += p.vy;
+            p.x += p.vx + Math.sin(p.d) * 0.5;
+            p.tilt += 0.1;
+            
+            ctx.beginPath();
+            ctx.lineWidth = p.r;
+            ctx.strokeStyle = p.color;
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p.x + Math.sin(p.tilt) * 10, p.y + Math.cos(p.tilt) * 10);
+            ctx.stroke();
+
+            if (p.y < canvas.height) alive = true;
+        }
+
+        if (alive) {
+            requestAnimationFrame(animate);
+        } else {
+            particles = [];
+            isAnimating = false;
+        }
+    }
+</script>
+</body>
+</html>
