@@ -208,6 +208,7 @@
                 覆盖 30 种中国互联网特有的意识形态坐标。
             </p>
         <style>
+   <style>
     /* 容器样式：保持清爽，与其他内容区隔开 */
     .cross-promo-box {
         margin: 40px auto 20px auto; /* 上边距大一点，作为页面的结尾 */
@@ -218,6 +219,7 @@
         text-align: center;
         border: 2px dashed #e0e0e0; /* 虚线边框 */
         box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     
     .promo-title {
@@ -269,15 +271,16 @@
         margin-bottom: 5px;
     }
 
-    /* === 8种颜色主题 === */
+    /* === 颜色主题 === */
     .c-parenting { background: linear-gradient(135deg, #FF9A9E, #FECFEF); color: #864449; } /* 养娃：粉嫩 */
     .c-check     { background: linear-gradient(135deg, #a8edea, #fed6e3); color: #555; } /* 父母检测：清新 */
     .c-human     { background: linear-gradient(135deg, #667eea, #764ba2); } /* 说明书：深紫 */
-    .c-tax       { background: linear-gradient(135deg, #ff9a9e, #fecfef); background: linear-gradient(to right, #43e97b 0%, #38f9d7 100%); color: #2d5a45; } /* 智商税：钱的绿色 */
+    .c-tax       { background: linear-gradient(to right, #43e97b 0%, #38f9d7 100%); color: #2d5a45; } /* 智商税：钱的绿色 */
     .c-net       { background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%); } /* 互联网：科技蓝 */
-    .c-buffett   { background: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%); background: linear-gradient(120deg, #f6d365 0%, #fda085 100%); } /* 巴菲特：金色 */
+    .c-buffett   { background: linear-gradient(120deg, #f6d365 0%, #fda085 100%); } /* 巴菲特：金色 */
     .c-resign    { background: linear-gradient(to right, #fa709a 0%, #fee140 100%); } /* 裸辞：警示橙红 */
     .c-marriage  { background: linear-gradient(to top, #ff0844 0%, #ffb199 100%); } /* 婚姻：热烈红 */
+    .c-city      { background: linear-gradient(to top, #48c6ef 0%, #6f86d6 100%); } /* 命定之城：天际蓝 */
 
 </style>
 
@@ -286,12 +289,12 @@
     <div class="promo-grid">
         <a href="https://circle-of-competence.github.io/In-depth-Parenting-Assessment/" class="promo-link c-parenting">
             <span class="promo-icon">👶</span>
-            <span>深度养育攻略</span>
+            <span>养娃后检测</span>
         </a>
         
         <a href="https://circle-of-competence.github.io/father-and-mother-OK-/" class="promo-link c-check">
             <span class="promo-icon">👨‍👩‍👧</span>
-            <span>父母合格检测</span>
+            <span>要娃前检测</span>
         </a>
         
         <a href="https://circle-of-competence.github.io/human-manual/" class="promo-link c-human">
@@ -306,7 +309,7 @@
 
         <a href="https://circle-of-competence.github.io/Political-Typology-Quiz/" class="promo-link c-net">
             <span class="promo-icon">🌐</span>
-            <span>互联网成分</span>
+            <span>互联网成分检测</span>
         </a>
 
         <a href="https://circle-of-competence.github.io/" class="promo-link c-buffett">
@@ -321,10 +324,15 @@
 
         <a href="https://circle-of-competence.github.io/Marriage-Assessment-Tool/" class="promo-link c-marriage">
             <span class="promo-icon">💍</span>
-            <span>婚姻质量检测</span>
+            <span>婚前精神体检</span>
         </a>
-             </div>
+
+        <a href="https://circle-of-competence.github.io/-/" class="promo-link c-city">
+            <span class="promo-icon">🏙️</span>
+            <span>命定之城测试</span>
+        </a>
     </div>
+</div>
             <button class="action-btn" onclick="startQuiz()">开始扫描</button>
         </div>
     </div>
